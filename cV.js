@@ -56,7 +56,6 @@ correlationVector = (function () {
     spinDefaults.Entropy = spinConstants.Entropy.Two;    
 
 
-
     function isInit() {
         return isValid(storedCv());
     }
@@ -79,42 +78,7 @@ correlationVector = (function () {
         }
     }
 
-    function baseIncrement()
-    {
-        /// <summary>
-        /// Privileged method used to increment the impression digit of the CV
-        /// </summary>
-        /// <remarks>
-        ///  The Impresison Digit is the digit in a cV that is second from the left.
-        ///   AN3XAMPL3CVBA53.1.2    In the example to the left it would be the 1
-        /// </remarks>
-        /// <returns type="string">Serialized value of the Correlation Vector</returns>
-        var cVTemp = storedCv().split(".");
-        var size = cVTemp.length;
-        if (size > 2)
-        {
-            // reset base since we will rebuiding it.
-            base = "";
-            var cV_IgIndex = size - 2;
-            var cV_ig = parseInt(cVTemp[cV_IgIndex]) +1;
-            for(var i =0; i < cV_IgIndex; i++)
-                {
-                    base = base.concat(cVTemp[i], ".");
-                }
-
-            base = base.concat(cV_ig.toString());
-            currentElement = 0;
-        }
-        else
-        {
-            // cV doesn't have an impression digit, so we just increment.
-            increment();
-        }
-        return storedCv();
-    }
-
-    function spinIncrement(settings)
-    {
+    function spinIncrement(settings) {
         if (canSpin())
         {
             extend();
@@ -123,14 +87,14 @@ correlationVector = (function () {
             }
         
             var entropy = 0;
-            if (settings.Entropy > 0)        {
+            if (settings.Entropy > 0) {
                 var entoryPow = settings.Entropy * 8;
                 entropy = Math.round(Math.random() * Math.pow(2,((settings.Entropy * 8) -1)));
             }
         
             var value = 0;
       
-            // the Interval of change should be 1.67 seconds for Coarse
+            // The Interval of change should be 1.67 seconds for Coarse
             // and 6.6 ms for fine
             // In JavaScript I am going to use 1.67 seconds, but 7 ms since
             // the Javascript clock stops at the millisecond.
@@ -209,37 +173,12 @@ correlationVector = (function () {
         return storedCv();
     }
 
-    function ServerInit(cVInitValue)
-    {
+    function init(cVInitValue) {
         base = seedCorrelationVector();
         currentElement = 0;
         return storedCv();
     }
 
-    function ClientInit(cVInitValue) {
-        /// <summary>
-        /// This function should always be called by adopters
-        /// </summary>
-        /// <param type = "string"> optional cV constructor value </param>
-        /// <returns type="string">Serialized Correlation Vector</returns>
-
-        if (cVInitValue)
-        {
-            // If a value is passed in, we need to add the Impression Digit, and the current Element
-            setValue(cVInitValue);
-            extend();
-            extend();
-        }
-        else
-        {
-            base = seedCorrelationVector();
-            currentElement = 1;
-            extend();    
-        }
-
-        return  storedCv();
-    }
-    
 
     function seedCorrelationVector() {
         /// <summary>
@@ -339,12 +278,10 @@ correlationVector = (function () {
         canIncrement: canIncrement,
         getValue: getValue,
         setValue: setValue,
-        ClientSeed: ClientInit,
-        ServerSeed: ServerInit,
+        init: init,
         extend: extend,
         increment: increment,
         spin: spinIncrement,
-        baseIncrement: baseIncrement,
         isValid: isValid,
         useCv1: useCv1,
         useCv2: useCv2

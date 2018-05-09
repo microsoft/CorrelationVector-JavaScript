@@ -1,0 +1,14 @@
+{
+"spec_dir": "spec",
+
+"spec_files": [
+"cVSpec.js"
+],
+
+"helpers": [
+],
+"stopSpecOnExpectationFailure": false,
+
+"random": true
+
+}

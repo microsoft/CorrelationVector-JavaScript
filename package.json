@@ -1,8 +1,8 @@
 {
-  "name": "cVJava",
+  "name": "correlation-vector",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "jasmine specs/cVSpec.js"
   },
@@ -10,6 +10,20 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "jasmine": "^3.1.0"
+    "browserify": "^16.2.2",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-replace": "^1.0.0",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-typescript": "4.0.2",
+    "gulp-uglify": "^3.0.0",
+    "jasmine": "^3.1.0",
+    "merge2": "^1.2.2",
+    "tsify": "^4.0.0",
+    "tslint": "^5.10.0",
+    "typescript": "^2.9.2",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0"
   }
 }

@@ -1,5 +1,7 @@
-// copyright (c) Microsoft Corporation. All rights reserved.
-// licensed under the MIT License.
+/**
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License.
+ */
 
 export enum CorrelationVectorVersion {
     V1,

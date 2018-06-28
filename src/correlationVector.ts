@@ -1,13 +1,15 @@
-// copyright (c) Microsoft Corporation. All rights reserved.
-// licensed under the MIT License.
+/**
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License.
+ */
 
 import { CorrelationVectorVersion } from "./CorrelationVectorversion";
 import { SpinCounterInterval, SpinCounterPeriodicity, SpinEntropy, SpinParameters } from "./spinParameters";
 
-/// <summary>
-/// this class represents a lightweight vector for identifying and measuring
-/// causality.
-/// </summary>
+/**
+ * This class represents a lightweight vector for identifying and measuring
+ * causality.
+ */
 export class CorrelationVector {
     private static readonly maxVectorLength: number = 63;
     private static readonly maxVectorLengthV2: number = 127;
@@ -21,32 +23,30 @@ export class CorrelationVector {
 
     private immutable: boolean = false;
 
-    /// <summary>
-    /// this is the header that should be used between services to pass the correlation
-    /// vector.
-    /// </summary>
+    /**
+     * This is the header that should be used between services to pass the correlation
+     * vector.
+     */
     public static readonly headerName: string = "MS-CV";
 
-    /// <summary>
-    /// this is termination sign should be used when vector lenght exceeds
-    /// max allowed length
-    /// </summary>
+    /**
+     * This is termination sign should be used when vector lenght exceeds
+     * max allowed length
+     */
     public static readonly terminationSign: string = "!";
 
-    /// <summary>
-    /// gets or sets a value indicating whether or not to validate the correlation
-    /// vector on creation.
-    /// </summary>
+    /**
+     * Gets or sets a value indicating whether or not to validate the correlation
+     * vector on creation.
+     */
     public static validateCorrelationVectorDuringCreation: boolean;
 
-    /// <summary>
-    /// creates a new correlation vector by extending an existing value. This should be
-    /// done at the entry point of an operation.
-    /// </summary>
-    /// <param name="correlationVector">
-    /// taken from the message header indicated by <see cref="headerName"/>.
-    /// </param>
-    /// <returns>A new correlation vector extended from the current vector.</returns>
+    /**
+     * Creates a new correlation vector by extending an existing value. This should be
+     * done at the entry point of an operation.
+     * @param {string} correlationVector taken from the message header indicated by {@link CorrelationVector#headerName}
+     * @returns {CorrelationVector} A new correlation vector extended from the current vector.
+     */
     public static extend(correlationVector: string): CorrelationVector {
         if (CorrelationVector.isImmutable(correlationVector)) {
             return CorrelationVector.parse(correlationVector);
@@ -66,17 +66,13 @@ export class CorrelationVector {
         return new CorrelationVector(correlationVector, 0, version, false);
     }
 
-    /// <summary>
-    /// creates a new correlation vector by applying the Spin operator to an existing value.
-    /// this should be done at the entry point of an operation.
-    /// </summary>
-    /// <param name="correlationVector">
-    /// taken from the message header indicated by <see cref="headerName"/>.
-    /// </param>
-    /// <param name="parameters">
-    /// the parameters to use when applying the Spin operator.
-    /// </param>
-    /// <returns>A new correlation vector extended from the current vector.</returns>
+    /**
+     * Creates a new correlation vector by applying the Spin operator to an existing value.
+     * this should be done at the entry point of an operation.
+     * @param {string} correlationVector taken from the message header indicated by {@link CorrelationVector#headerName}
+     * @param {SpinParameters} parameters the parameters to use when applying the Spin operator.
+     * @returns {CorrelationVector} A new correlation vector spined from the current vector.
+     */
     public static spin(correlationVector: string, parameters?: SpinParameters): CorrelationVector {
         if (CorrelationVector.isImmutable(correlationVector)) {
             return CorrelationVector.parse(correlationVector);
@@ -125,11 +121,11 @@ export class CorrelationVector {
         return new CorrelationVector(baseVector, 0, version, false);
     }
 
-    /// <summary>
-    /// creates a new correlation vector by parsing its string representation
-    /// </summary>
-    /// <param name="correlationVector">correlationVector</param>
-    /// <returns>CorrelationVector</returns>
+    /**
+     * Creates a new correlation vector by parsing its string representation
+     * @param {string} correlationVector correlationVector
+     * @returns {CorrelationVector} parsed correlation vector
+     */
     public static parse(correlationVector: string): CorrelationVector {
         if (correlationVector) {
             let p:number = correlationVector.lastIndexOf(".");
@@ -152,33 +148,32 @@ export class CorrelationVector {
         return CorrelationVector.createCorrelationVector();
     }
 
-    /// <summary>
-    /// initializes a new instance of the <see cref="CorrelationVector"/> class of the
-    /// given implemenation version. This should only be called when no correlation
-    /// vector was found in the message header.
-    /// </summary>
-    /// <param name="version">The correlation vector implemenation version.</param>
+    /**
+     * Initializes a new instance of the {@link CorrelationVector} class of the
+     * given implemenation version. This should only be called when no correlation
+     * vector was found in the message header.
+     * @param {CorrelationVectorVersion} version The correlation vector implemenation version.
+     * @returns {CorrelationVector} created correlation vector
+     */
     public static createCorrelationVector(version?: CorrelationVectorVersion): CorrelationVector {
         version = version || CorrelationVectorVersion.V1;
         return new CorrelationVector(CorrelationVector.seedCorrelationVector(version), 0, version, false);
     }
 
 
-    /// <summary>
-    /// gets the value of the correlation vector as a string.
-    /// </summary>
+    /**
+     * Gets the value of the correlation vector as a string.
+     */
     public get value(): string {
         return `${this.baseVector}.${this.extension}${this.immutable ? CorrelationVector.terminationSign : ""}`;
     }
 
-    /// <summary>
-    /// increments the current extension by one. Do this before passing the value to an
-    /// outbound message header.
-    /// </summary>
-    /// <returns>
-    /// the new value as a string that you can add to the outbound message header
-    /// indicated by <see cref="headerName"/>.
-    /// </returns>
+    /**
+     * Increments the current extension by one. Do this before passing the value to an
+     * outbound message header.
+     * @returns {string} the new value as a string that you can add to the outbound message header
+     * indicated by {@link CorrelationVector#headerName}.
+     */
     public increment(): string {
         if (this.immutable) {
             return this.value;
@@ -196,16 +191,15 @@ export class CorrelationVector {
         return `${this.baseVector}.${next}`;
     }
 
-    /// <summary>
-    /// gets the version of the correlation vector implementation.
-    /// </summary>
+    /**
+     * Gets the version of the correlation vector implementation.
+     */
     public version: CorrelationVectorVersion;
 
-
-    /// <summary>
-    /// returns a string that represents the current object.
-    /// </summary>
-    /// <returns>A string that represents the current object.</returns>
+    /**
+     * Returns a string that represents the current object.
+     * @returns {string} A string that represents the current object.
+     */
     public toString(): string {
         return this.value;
     }
@@ -217,10 +211,10 @@ export class CorrelationVector {
         this.immutable = immutable || CorrelationVector.isOversized(baseVector, extension, version);
     }
 
-    /// <summary>
-    /// seed function to randomly generate a 16 character base64 encoded string for the Correlation Vector's base value
-    /// </summary>
-    /// <returns type="string">Returns generated base value</returns>
+    /**
+     * Seed function to randomly generate a 16 character base64 encoded string for the Correlation Vector's base value
+     * @returns {string} Returns generated base value
+     */
     private static seedCorrelationVector(version: CorrelationVectorVersion): string {
         let result:string = "";
         let baseLength: number = version === CorrelationVectorVersion.V1 ?

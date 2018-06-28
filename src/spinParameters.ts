@@ -1,57 +1,59 @@
-// copyright (c) Microsoft Corporation. All rights reserved.
-// licensed under the MIT License.
+/**
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License.
+ */
 
 export enum SpinCounterInterval {
-    /// <summary>
-    /// the coarse interval drops the 24 least significant bits in DateTime.Ticks
-    /// resulting in a counter that increments every 1.67 seconds.
-    /// </summary>
+    /**
+     * The coarse interval drops the 24 least significant bits in DateTime.Ticks
+     * resulting in a counter that increments every 1.67 seconds.
+     */
     Coarse,
 
-    /// <summary>
-    /// the fine interval drops the 16 least significant bits in DateTime.Ticks
-    /// resulting in a counter that increments every 6.5 milliseconds.
-    /// </summary>
+    /**
+     * The fine interval drops the 16 least significant bits in DateTime.Ticks
+     * resulting in a counter that increments every 6.5 milliseconds.
+     */
     Fine
 }
 
 export enum SpinCounterPeriodicity {
-    /// <summary>
-    /// do not store a counter as part of the spin value.
-    /// </summary>
+    /**
+     * Do not store a counter as part of the spin value.
+     */
     None,
 
-    /// <summary>
-    /// the short periodicity stores the counter using 16 bits.
-    /// </summary>
+    /**
+     * The short periodicity stores the counter using 16 bits.
+     */
     Short,
 
-    /// <summary>
-    /// the medium periodicity stores the counter using 24 bits.
-    /// </summary>
+    /**
+     * The medium periodicity stores the counter using 24 bits.
+     */
     Medium,
 }
 
 export enum SpinEntropy {
-    /// <summary>
-    /// do not generate entropy as part of the spin value.
-    /// </summary>
+    /**
+     * Do not generate entropy as part of the spin value.
+     */
     None = 0,
 
-    /// <summary>
-    /// generate entropy using 8 bits.
-    /// </summary>
+    /**
+     * Generate entropy using 8 bits.
+     */
     One = 1,
 
-    /// <summary>
-    /// generate entropy using 16 bits.
-    /// </summary>
+    /**
+     * Generate entropy using 16 bits.
+     */
     Two = 2,
 }
 
-/// <summary>
-/// this class stores parameters used by the CorrelationVector Spin operator.
-/// </summary>
+/**
+ * This class stores parameters used by the CorrelationVector Spin operator.
+ */
 export class SpinParameters {
     constructor(interval: SpinCounterInterval, periodicity: SpinCounterPeriodicity, entropy: SpinEntropy) {
         this.interval = interval;
@@ -59,24 +61,26 @@ export class SpinParameters {
         this.entropy = entropy;
     }
 
-    /// <summary>
-    /// the interval (proportional to time) by which the counter increments.
-    /// </summary>
+    /**
+     * The interval (proportional to time) by which the counter increments.
+     */
     public interval: SpinCounterInterval;
 
-    /// <summary>
-    /// how frequently the counter wraps around to zero, as determined by the amount
-    /// of space to store the counter.
-    /// </summary>
+    /**
+     * How frequently the counter wraps around to zero, as determined by the amount
+     * of space to store the counter.
+     */
     public periodicity: SpinCounterPeriodicity;
 
-    /// <summary>
-    /// the number of bytes to use for entropy. Valid values from a
-    /// minimum of 0 to a maximum of 4.
-    /// </summary>
+    /**
+     * The number of bytes to use for entropy. Valid values from a
+     * minimum of 0 to a maximum of 4.
+     */
     public entropy: SpinEntropy;
 
-    // the number of total bits used for spin.
+    /**
+     * The number of total bits used for spin.
+     */
     public get totalBits(): number {
         let counterBits: number;
         switch (this.periodicity) {

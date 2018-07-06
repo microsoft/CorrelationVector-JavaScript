@@ -24,6 +24,7 @@ gulp.task("build", ["copy-ts"], function () {
         debug: true,
         entries: ["lib/correlationVector.ts"],
         cache: {},
+        standalone: 'CV',
         packageCache: {}
     })
         .plugin(tsify)

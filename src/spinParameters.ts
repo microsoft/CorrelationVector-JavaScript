@@ -21,17 +21,17 @@ export enum SpinCounterPeriodicity {
     /**
      * Do not store a counter as part of the spin value.
      */
-    None,
+    None = 0,
 
     /**
      * The short periodicity stores the counter using 16 bits.
      */
-    Short,
+    Short = 16,
 
     /**
      * The medium periodicity stores the counter using 24 bits.
      */
-    Medium,
+    Medium = 24,
 }
 
 export enum SpinEntropy {
@@ -78,11 +78,21 @@ export class SpinParameters {
      */
     public entropy: SpinEntropy;
 
-    /**
-     * The number of total bits used for spin.
-     */
+    public get ticksBitsToDrop(): number {
+        switch (this.interval) {
+            case SpinCounterInterval.Coarse:
+                return 24;
+
+            case SpinCounterInterval.Fine:
+                return 16;
+
+            default:
+                return 24;
+        }
+    }
+
     public get totalBits(): number {
-        let counterBits: number;
+        let counterBits: number = 0;
         switch (this.periodicity) {
             case SpinCounterPeriodicity.None:
                 counterBits = 0;
@@ -97,8 +107,6 @@ export class SpinParameters {
                 counterBits = 0;
                 break;
         }
-
         return counterBits + this.entropy * 8;
-
     }
 }

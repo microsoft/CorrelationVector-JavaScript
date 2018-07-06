@@ -3,7 +3,7 @@
  *  Licensed under the MIT License.
  */
 
-import { CorrelationVectorVersion } from "./CorrelationVectorversion";
+import { CorrelationVectorVersion } from "./correlationVectorVersion";
 import { SpinCounterInterval, SpinCounterPeriodicity, SpinEntropy, SpinParameters } from "./spinParameters";
 
 /**
@@ -91,27 +91,30 @@ export class CorrelationVector {
             SpinEntropy.Two
         );
 
-        let value: number = 0;
+        // javascription only returns ms, 1ms = 10000ticks
+        let ticks: number = Date.now() * 10000;
 
-        // the Interval of change should be 1.67 seconds for Coarse
-        // and 6.6 ms for fine
-        // in JavaScript I am going to use 1.67 seconds, but 7 ms since
-        // the Javascript clock stops at the millisecond.
-        if (parameters.interval === SpinCounterInterval.Coarse) {
-            value = Math.round(Date.now() / 1670);
-        } else if (parameters.interval === SpinCounterInterval.Fine) {
-            value = Math.round(Date.now() / 7);
-        }
+        // javascript only supports 32-bit bitwise operation, we need to convert it to string
+        let value: string = ticks.toString(2);
+        value = value.substring(0, value.length - parameters.ticksBitsToDrop);
 
         if (parameters.entropy > 0) {
-            let entropy: number = Math.round(Math.random() * Math.pow(2, ((parameters.entropy * 8) - 1)));
-
-            // tslint:disable-next-line:no-bitwise
-            value = (value << (parameters.entropy * 8)) | entropy;
+            const entropypow: number = parameters.entropy * 8;
+            let entropy: string =
+                (Math.round(Math.random() * Math.pow(2, ((entropypow) - 1)))).toString(2);
+            while (entropy.length < entropypow) {
+                entropy = "0" + entropy;
+            }
+            value = value + entropy;
         }
 
-        // tslint:disable-next-line:no-bitwise
-        let s: number = value & ((1 << parameters.totalBits) - 1);
+        // the max safe number for js is 52.
+        const allowedBits: number = Math.min(52, parameters.totalBits);
+        if (value.length > allowedBits) {
+            value = value.substr(value.length - allowedBits);
+        }
+
+        let s: number = parseInt(value, 2);
 
         let baseVector: string = `${correlationVector}.${s}`;
         if (CorrelationVector.isOversized(baseVector, 0, version)) {
@@ -128,8 +131,8 @@ export class CorrelationVector {
      */
     public static parse(correlationVector: string): CorrelationVector {
         if (correlationVector) {
-            let p:number = correlationVector.lastIndexOf(".");
-            let immutable:boolean = CorrelationVector.isImmutable(correlationVector);
+            let p: number = correlationVector.lastIndexOf(".");
+            let immutable: boolean = CorrelationVector.isImmutable(correlationVector);
             if (p > 0) {
                 let extensionValue: string = immutable ?
                     correlationVector.substr(p + 1, correlationVector.length - p - 1 - CorrelationVector.terminationSign.length)
@@ -181,7 +184,7 @@ export class CorrelationVector {
         if (this.extension === Number.MAX_SAFE_INTEGER) {
             return this.value;
         }
-        let next:number = this.extension + 1;
+        let next: number = this.extension + 1;
         if (CorrelationVector.isOversized(this.baseVector, next, this.version)) {
             this.immutable = true;
             return this.value;
@@ -216,11 +219,11 @@ export class CorrelationVector {
      * @returns {string} Returns generated base value
      */
     private static seedCorrelationVector(version: CorrelationVectorVersion): string {
-        let result:string = "";
+        let result: string = "";
         let baseLength: number = version === CorrelationVectorVersion.V1 ?
             CorrelationVector.baseLength :
             CorrelationVector.baseLengthV2;
-        for (let i:number = 0; i < baseLength; i++) {
+        for (let i: number = 0; i < baseLength; i++) {
             result += CorrelationVector.base64CharSet.charAt(Math.floor(Math.random() * CorrelationVector.base64CharSet.length));
         }
 
@@ -246,7 +249,7 @@ export class CorrelationVector {
 
     private static isOversized(baseVector: string, extension: number, version: CorrelationVectorVersion): boolean {
         if (baseVector) {
-            let size:number = baseVector.length + 1 +
+            let size: number = baseVector.length + 1 +
                 (extension > 0 ? Math.floor(Math.log10(extension)) : 0) + 1;
             return ((version === CorrelationVectorVersion.V1 &&
                 size > CorrelationVector.maxVectorLength) ||

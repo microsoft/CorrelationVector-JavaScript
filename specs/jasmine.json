@@ -1,8 +1,8 @@
 {
-"spec_dir": "spec",
+"spec_dir": "specs",
 
 "spec_files": [
-"cVSpec.js"
+"correlationVectorSpec.ts"
 ],
 
 "helpers": [

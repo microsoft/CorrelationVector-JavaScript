@@ -17,6 +17,16 @@ export class CorrelationVector {
     private static readonly baseLengthV2: number = 22;
     private static readonly base64CharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
+    // In order to reliably convert a V2 vector base to a guid, the four least significant bits of the last base64
+    // content-bearing 6-bit block must be zeros.
+    //
+    // Base64 characters with four least significant bits of zero are:
+    // A - 00 0000
+    // Q - 01 0000
+    // g - 10 0000
+    // w - 11 0000
+    private static readonly base64LastCharSet = "AQgw";
+
     private baseVector: string = null;
 
     private extension: number = 0;
@@ -222,9 +232,13 @@ export class CorrelationVector {
         let result: string = "";
         let baseLength: number = version === CorrelationVectorVersion.V1 ?
             CorrelationVector.baseLength :
-            CorrelationVector.baseLengthV2;
+            CorrelationVector.baseLengthV2 - 1;
         for (let i: number = 0; i < baseLength; i++) {
             result += CorrelationVector.base64CharSet.charAt(Math.floor(Math.random() * CorrelationVector.base64CharSet.length));
+        }
+
+        if (version === CorrelationVectorVersion.V2) {
+            result += CorrelationVector.base64LastCharSet.charAt(Math.floor(Math.random() * CorrelationVector.base64LastCharSet.length));
         }
 
         return result;

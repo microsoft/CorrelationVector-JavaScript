@@ -1,5 +1,10 @@
 # Correlation Vector-JavaScript
 
+--------------------------------
+This repository has been archived due to sustained lack of activity as noted in issue: [https://github.com/microsoft/CorrelationVector-JavaScript/issues/10](https://github.com/microsoft/CorrelationVector-JavaScript/issues/10)
+--------------------------------
+
+
 CorrelationVector-JavaScript provides the JavaScript implementation of the CorrelationVector protocol for tracing and correlation of events through a distributed system.
 
 # Correlation Vector
